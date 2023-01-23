@@ -47,7 +47,8 @@
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
             "symfony/flex": true,
-            "symfony/runtime": true
+            "symfony/runtime": true,
+            "phpstan/extension-installer": true
         },
         "optimize-autoloader": true,
         "preferred-install": {
@@ -83,6 +84,11 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
+        ],
+        "fix": "php-cs-fixer fix",
+        "check": [
+            "phpstan",
+            "php-cs-fixer fix --dry-run --diff"
         ]
     },
     "conflict": {
@@ -95,6 +101,12 @@
         }
     },
     "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.13",
+        "phpstan/extension-installer": "^1.2",
+        "phpstan/phpstan": "^1.9",
+        "phpstan/phpstan-doctrine": "^1.3",
+        "phpstan/phpstan-phpunit": "^1.3",
+        "phpstan/phpstan-symfony": "^1.2",
         "phpunit/phpunit": "^9.5",
         "symfony/browser-kit": "6.0.*",
         "symfony/css-selector": "6.0.*",
