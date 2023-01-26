@@ -1,21 +1,50 @@
-version: '3'
+version: "3"
 
 services:
-###> doctrine/doctrine-bundle ###
-  database:
-    image: postgres:${POSTGRES_VERSION:-15}-alpine
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
-      POSTGRES_USER: ${POSTGRES_USER:-app}
+  app:
+    image: drakona/php:8.1-symfony
+    depends_on:
+      - db
     volumes:
-      - db-data:/var/lib/postgresql/data:rw
-      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./docker/db/data:/var/lib/postgresql/data:rw
-###< doctrine/doctrine-bundle ###
+      - .:/srv
+
+  nginx:
+    image: drakona/nginx:8-symfony
+    depends_on:
+      - app
+    volumes:
+      - .:/srv
+    ports:
+      - "8000:80"
+
+  db:
+    image: mariadb:10
+    environment:
+      MARIADB_ROOT_PASSWORD: pass
+      MARIADB_DATABASE: api
+    volumes:
+      - db-data:/var/lib/mysql
+    ports:
+      - "3307:3307"
+
+  phpmyadmin:
+        image: phpmyadmin
+        container_name: phpmyadmin_drako
+        restart: always
+        depends_on:
+            - db
+        ports:
+            - "8080:80"
+        environment:
+            PMA_HOST: db
+
+  mailhog:
+    image: mailhog/mailhog
+    logging:
+      driver: 'none'
+    ports:
+      - '8025:8025'
+      - '1025:1025'
 
 volumes:
-###> doctrine/doctrine-bundle ###
-  db-data:
-###< doctrine/doctrine-bundle ###
+  db-data: {}
